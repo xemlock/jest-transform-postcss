@@ -1,7 +1,7 @@
 {
   "name": "jest-transform-postcss",
   "description": "Jest transformer to import PostCSS-processed CSS into Jest's `jsdom`",
-  "version": "6.0.3",
+  "version": "7.0.0",
   "main": "index.js",
   "author": "Dominik Ferber <dominik.ferber+npm@gmail.com> (http://dferber.de/)",
   "contributors": [
