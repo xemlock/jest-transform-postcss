@@ -36,26 +36,6 @@ module.exports = {
   },
 
   process: (src, filename, config, options) => {
-    // skip when plain CSS is used
-    // You can pass config to the transformer in jest.config.js like so:
-    // "^.+\\.css$": ["jest-transform-css", { modules: true }]
-    // to enable css module transformation.
-    const useModules =
-      config &&
-      config.transformerConfig &&
-      ((typeof config.transformerConfig.modules === "boolean" &&
-        config.transformerConfig.modules));
-    if (!useModules) {
-      return {
-        code: stripIndent`
-          const styleInject = require('style-inject');
-
-          styleInject(${JSON.stringify(src)});
-          module.exports = {};
-        `,
-      };
-    }
-
     // The "process" function of this Jest transform must be sync,
     // but postcss is async. So we spawn a sync process to do an sync
     // transformation!

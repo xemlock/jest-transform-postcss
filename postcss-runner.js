@@ -15,13 +15,13 @@ module.exports = ({ src, filename, transformConfig }) => {
     // set both options to point to the same file"
     // https://github.com/postcss/postcss/blob/master/docs/guidelines/runner.md#21-set-from-and-to-processing-options
     from: filename,
-    to: filename
+    to: filename,
   };
   let tokens = {};
   return postcssrc(ctx)
     .then(
-      config => ({ ...config, plugins: config.plugins || [] }),
-      error => {
+      (config) => ({ ...config, plugins: config.plugins || [] }),
+      (error) => {
         // Support running without postcss.config.js
         // This is useful in case the webpack setup of the consumer does not
         // use PostCSS at all and simply uses css-loader in modules mode.
@@ -29,45 +29,52 @@ module.exports = ({ src, filename, transformConfig }) => {
           return { plugins: [], options: { from: filename, to: filename } };
         }
         throw error;
-      }
+      },
     )
     .then(({ plugins, options }) => {
-      return postcss([
-        cssModules({
-          // Add 'generateScopedName' property to 'jesttransformcss.config.js' for custom name generation. 
-          // List of available placeholder tokens: https://github.com/webpack/loader-utils#interpolatename
-          // *Note some placeholder tokens appear to not be working
-          generateScopedName:
-            transformConfig && transformConfig.generateScopedName ||
-            "[path][local]-[hash:base64:10]",
-          getJSON: (cssFileName, exportedTokens, outputFileName) => {
-            tokens = exportedTokens;
-          }
-        }),
-        ...plugins
-      ])
+      return postcss(
+        [
+          // You can pass config to the transformer in jest.config.js like so:
+          // "^.+\\.css$": ["jest-transform-postcss", { modules: true }]
+          // to enable css module transformation.
+          transformConfig &&
+            transformConfig.modules &&
+            cssModules({
+              // Add 'generateScopedName' property to 'jesttransformcss.config.js' for custom name generation.
+              // List of available placeholder tokens: https://github.com/webpack/loader-utils#interpolatename
+              // *Note some placeholder tokens appear to not be working
+              generateScopedName:
+                (transformConfig && transformConfig.generateScopedName) ||
+                "[path][local]-[hash:base64:10]",
+              getJSON: (cssFileName, exportedTokens, outputFileName) => {
+                tokens = exportedTokens;
+              },
+            }),
+          ...plugins,
+        ].filter(Boolean),
+      )
         .process(src, options)
         .then(
-          result => ({
+          (result) => ({
             css: result.css,
             tokens,
             // Display result.warnings()
             // PostCSS runners must output warnings from result.warnings()
             // https://github.com/postcss/postcss/blob/master/docs/guidelines/runner.md#32-display-resultwarnings
-            warnings: result.warnings().map(warn => warn.toString())
+            warnings: result.warnings().map((warn) => warn.toString()),
           }),
           // Don’t show JS stack for CssSyntaxError
           // PostCSS runners must not show a stack trace for CSS syntax errors,
           // as the runner can be used by developers who are not familiar with
           // JavaScript. Instead, handle such errors gracefully:
           // https://github.com/postcss/postcss/blob/master/docs/guidelines/runner.md#31-dont-show-js-stack-for-csssyntaxerror
-          error => {
+          (error) => {
             if (error.name === "CssSyntaxError") {
               process.stderr.write(error.message + error.showSourceCode());
             } else {
               throw error;
             }
-          }
+          },
         );
     });
 };
