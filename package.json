@@ -1,6 +1,6 @@
 {
-  "name": "jest-transform-css",
-  "description": "Jest transformer to import CSS into Jest's `jsdom`",
+  "name": "jest-transform-postcss",
+  "description": "Jest transformer to import PostCSS-processed CSS into Jest's `jsdom`",
   "version": "6.0.3",
   "main": "index.js",
   "author": "Dominik Ferber <dominik.ferber+npm@gmail.com> (http://dferber.de/)",
@@ -14,7 +14,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "https://github.com/dferber90/jest-transform-css.git"
+    "url": "https://github.com/xemlock/jest-transform-postcss.git"
   },
   "devDependencies": {
     "postcss": "^8.4.12"

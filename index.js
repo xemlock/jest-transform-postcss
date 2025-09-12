@@ -99,7 +99,7 @@ module.exports = {
       console.log(result.stdout.toString());
       return {
         code: stripIndent`
-          console.error("transform-css: Failed to load '${filename}'");
+          console.error("transform-postcss: Failed to load '${filename}'");
           module.exports = {};
         `,
       };
