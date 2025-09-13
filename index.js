@@ -41,9 +41,8 @@ module.exports = {
     // transformation!
     // https://twitter.com/kentcdodds/status/1043194634338324480
     const postcssRunner = JSON.stringify(path.join(__dirname, "postcss-runner.js"));
-    const result = crossSpawn.sync("node", [
-      "-e",
-      stripIndent`
+    const result = crossSpawn.sync("node", [], {
+      input: stripIndent`
         require(${postcssRunner})(
           ${JSON.stringify({
             src,
@@ -54,9 +53,11 @@ module.exports = {
         )
         .then(out => { console.log(JSON.stringify(out)) })
       `,
-    ]);
+    });
 
     // check for errors of postcss-runner.js
+    // stdout and stderr may be null if the process failed to spawn
+    if (result.error) throw result.error;
     const error = result.stderr.toString();
     if (result.status !== 0 && error) throw error;
 
