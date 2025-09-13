@@ -36,6 +36,18 @@ module.exports = {
   },
 
   process: (src, filename, config, options) => {
+    // Don't run postcss on files in node_modules, they are expected to be loaded as-is.
+    if (filename.includes("node_modules/")) {
+      return {
+        code: stripIndent`
+          const styleInject = require('style-inject');
+
+          styleInject(${JSON.stringify(src)});
+          module.exports = {};
+        `,
+      };
+    }
+
     // The "process" function of this Jest transform must be sync,
     // but postcss is async. So we spawn a sync process to do an sync
     // transformation!
